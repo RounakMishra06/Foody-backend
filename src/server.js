@@ -90,12 +90,12 @@ app.get('/api/health', (req, res) => {
 });
 
 // Simple test route to check CORS
-app.get('/api/test-cors', (req, res) => {
+/*app.get('/api/test-cors', (req, res) => {
   res.json({ 
     message: 'CORS test successful',
     origin: req.headers.origin
   });
-});
+});*/
 
 // Error handling middleware
 app.use((err, req, res, next) => {
