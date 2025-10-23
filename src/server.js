@@ -30,12 +30,28 @@ const io = socketIo(server, {
 });
 
 // Middleware
-app.use(cors({
-  origin: '*', // Allow all origins for development
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  credentials: true
-}));
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+];
+
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or curl)
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      console.log(` Blocked by CORS: ${origin}`);
+      return callback(new Error('Not allowed by CORS'));
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  })
+);
+
 
 // Handle preflight requests
 app.options('*', cors());
@@ -90,12 +106,12 @@ app.get('/api/health', (req, res) => {
 });
 
 // Simple test route to check CORS
-/*app.get('/api/test-cors', (req, res) => {
+app.get('/api/test-cors', (req, res) => {
   res.json({ 
     message: 'CORS test successful',
     origin: req.headers.origin
   });
-});*/
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {
